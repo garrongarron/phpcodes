@@ -1,8 +1,6 @@
 <?php
-use Router\Router;
+use Viewer\Viewer;
 
-//http://localhost/this/is/a/test?name=value&k=v
-
-var_dump(Router::getRoute());
-var_dump(Router::getParameters());
+$data = array('It', 'is', 'data', 'sent', 'to', 'the', 'view');
+Viewer::show('helloworld', $data);
 
