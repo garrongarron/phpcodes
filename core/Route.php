@@ -35,6 +35,30 @@ class Route
 			$callback = self::$routes[$_SERVER['REQUEST_METHOD']][$key];
 			if(is_callable($callback)){
 				return $callback();
+			} else {
+				$method = explode('@', $callback);
+				$file = CONTROLLERFOLDER.'/'.$method[0].'.php';
+				if(file_exists($file)){
+					require_once $file;
+					if(class_exists($method[0])){
+						$class = $method[0];
+						$o = new $class();
+						if(method_exists($o, $method[1])){
+							return $o->$method[1]();
+						} else {
+							$msg = "Method '$method[0]::$method[1]()' not found";
+							return Viewer::show('mapping-out', $msg);
+						}
+						
+					} else {
+						$msg = "Class '$method[0]' not found";
+						return Viewer::show('mapping-out', $msg);
+					}
+					
+				} else {
+					$msg = "File '$file' not found";
+					return Viewer::show('mapping-out', $msg);
+				}
 			}
 		} else {
 			Header::set("HTTP/1.0 404 Not Found");
