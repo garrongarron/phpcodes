@@ -10,7 +10,7 @@ class MiddleWare
 	static private $group = [];
 	static private $callbackName = NULL;
 	static private $when = NULL;
-	static private $where = array();
+	static private $where = array('','');
 	
 	static public function setMiddleWareRoute($method, $name){
 		if(self::$when=='before'){
