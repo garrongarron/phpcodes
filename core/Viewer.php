@@ -12,7 +12,7 @@ class Viewer
 			ob_end_clean();
 			return $contenido;
 		}else {
-			return null;
+			return self::show('view-not-found', $file);
 		}
 	}
 }

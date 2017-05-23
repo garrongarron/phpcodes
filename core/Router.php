@@ -17,7 +17,7 @@ class Router
 				$data = explode('=', $v);
 				$params[$data[0]] = (isset($data[1]))?$data[1]:'';
 			}
-			self::$parameters = $params;
+			self::$parameters = array_merge($params, $_POST);
 		}
 		self::$route = explode('/', $url[0]);
 	}
