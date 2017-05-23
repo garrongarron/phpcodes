@@ -4,6 +4,7 @@ namespace Router;
 use Viewer\Viewer;
 use Header\Header;
 use Rest\Rest;
+use MiddleWare\MiddleWare;
 
 class Route
 {
@@ -13,22 +14,27 @@ class Route
 	
 	static public function get($url,$callback){
 		self::$routes['GET'][$url] = $callback;
+		MiddleWare::setMiddleWareRoute('GET', $url);
 	}
 	
 	static public function post($url,$callback){
 		self::$routes['POST'][$url] = $callback;
+		MiddleWare::setMiddleWareRoute('POST', $url);
 	}
 	
 	static public function put($url,$callback){
 		self::$routes['PUT'][$url] = $callback;
+		MiddleWare::setMiddleWareRoute('PUT', $url);
 	}
 	
 	static public function delete($url,$callback){
 		self::$routes['DELETE'][$url] = $callback;
+		MiddleWare::setMiddleWareRoute('DELETE', $url);
 	}
 	
 	static public function patch($url,$callback){
 		self::$routes['PATCH'][$url] = $callback;
+		MiddleWare::setMiddleWareRoute('PATCH', $url);
 	}
 	
 	static private function getKey(){
@@ -43,6 +49,7 @@ class Route
 	static public function run(){
 		$key = self::getKey();
 		if(isset(self::$routes[$_SERVER['REQUEST_METHOD']][$key])){
+			MiddleWare::before($_SERVER['REQUEST_METHOD'], $key);
 			$callback = self::$routes[$_SERVER['REQUEST_METHOD']][$key];
 			if(is_callable($callback)){
 				return $callback();

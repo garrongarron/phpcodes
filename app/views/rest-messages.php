@@ -10,5 +10,21 @@
 <a href="http://localhost/user/123">http://localhost/user/123</a><br>
 <a href="http://localhost/user/show">http://localhost/user/show</a> (Aditional Method)<br>
 <a href="http://localhost/user/123/claim/001">http://localhost/user/123/claim/001</a> (Nested Resources)<br>
+
+
+<br>
+<b>Please change 'true' by 'false'in <i>Routes.php</i></b>
+<pre>
+function isLogged(){
+    return true;
+}
+</pre>
+<b>It have to look like this.</b>
+<pre>
+function isLogged(){
+    return false;
+}
+</pre>
+
 </body>
 </html>
