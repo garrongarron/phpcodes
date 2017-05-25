@@ -1,13 +1,13 @@
 @extend( 'template/level-0'  )
 
-@section('titulo')
+@section('title')
 level -1
 @stop
 
-@section('contenido')
+@section('content')
 @parent
-<div style="background-color: #0f0;">Content of level #-1</div>
-	@yield('nueva')	
+<div style="background-color: #0f0;">Content of level #-1 <?php echo __FILE__;?> </div>
+	@yield('new')	
 		
 @stop
 

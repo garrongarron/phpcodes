@@ -7,19 +7,9 @@ class Parser
 	static private $view;
 	static public function make($view, $vars = array()){
 		self::run($view, $vars = array());
-
 		$names = array_keys(self::$collector);
-// 		[2,1,0]
-		for ($i = 0; $i < count($names); $i++) {
-			$current = self::$collector[$names[$i]];
-			if(isset($current['parent'])){
-				$origin = explode("\n",self::$collector[$current['parent']]['origin']);
-				foreach ($origin as $line){
-					self::getYield($line, $current);
-				}
-			}
-		}
-// 		[0,1,2]
+				
+// 		[0,1,2] // @parent
 		for ($i = count($names); $i > 0; $i--) {
 			$current = self::$collector[$names[$i-1]];
 			if(isset($current['parent'])){
@@ -39,34 +29,43 @@ class Parser
 				}
 			}
 		}
-		
+
+
 // 		[2,1,0]
 		for ($i = 0; $i < count($names); $i++) {
 			$current = self::$collector[$names[$i]];
 			if(isset($current['parent'])){
+				$origin = explode("\n",self::$collector[$current['parent']]['origin']);
+				foreach ($origin as $line){
+					self::getYield($line, $current);
+				}
 				foreach ($current['section']['stop'] as $key => $section){
+					//Getting new section
 					self::$collector[$current['parent']]['section-new'][$key] = $section;
 					if(isset(self::$collector[$current['parent']]['section']['show'][$key])){
+						//Overwrite Parent String
 						$search = implode("\n", self::$collector[$current['parent']]['section']['show'][$key]);
 						$replace = implode("\n", $section);
 						$subject = self::$collector[$current['parent']]['origin'];
 						$string = str_replace($search, $replace, $subject);
 						self::$collector[$current['parent']]['origin']= $string;
-						
+						//Overwrite Parent Section
 						self::$collector[$current['parent']]['section']['show'][$key] =
 						self::$collector[$current['parent']]['section-new'][$key];
 					}
 					if(isset(self::$collector[$current['parent']]['section']['stop'][$key])){
+						//Parent String modified
 						$search = implode("\n", self::$collector[$current['parent']]['section']['stop'][$key]);
 						$replace = implode("\n", $section);
 						$subject = self::$collector[$current['parent']]['origin'];
 						$string = str_replace($search, $replace, $subject);
 						self::$collector[$current['parent']]['origin']= $string;
-						
+						//Overwrite Parent Section
 						self::$collector[$current['parent']]['section']['stop'][$key] =
 						self::$collector[$current['parent']]['section-new'][$key];
 					}
 					
+					//Cleannig section declarations
 					$origin = explode("\n",self::$collector[$current['parent']]['origin']);
 					$out = [];
 					foreach ($origin as $line){
@@ -84,7 +83,7 @@ class Parser
 				}
 			}
 		}
-		return self::getYield2($names[count($names)-1]);
+		return self::yieldParser($names[count($names)-1]);
 	}
 	
 	static private function getYield($line, $current){
@@ -92,39 +91,29 @@ class Parser
 			$section = self::getBetwing($line, '@yield(', ')');
 			$section = trim(trim($section), "''");
 			if(isset($current['section']['stop'][$section])){
-				$start = strpos($line, '@yield(');
-				$end = strpos($line, ')');
-				$search = substr($line, $start, $end-$start+1);
 				$replace = implode("\n", $current['section']['stop'][$section]);
-				if(isset(self::$collector[$current['parent']]['section']['stop'])){
-					$stop = self::$collector[$current['parent']]['section']['stop'];
-					foreach ($stop as $k => $section){
-						foreach ($section as $k0 => $data){
-							if($data == $line){
-								self::$collector[$current['parent']]
-								['section']['stop'][$k][$k0] = $replace;
-							}
-						}
-					}
-				}					
+				if(!isset(self::$collector[$current['parent']]['section']['stop'])){
+					self::$collector[$current['parent']]['section']['stop'] = [];
+				}
+				self::$collector[$current['parent']]['section']['stop'] = 
+					array_merge(self::$collector[$current['parent']]['section']['stop'], 
+					$current['section']['stop']);
 			}
 		}
 	}
 	
-	static private function getYield2($string){
-		$str = explode("\n", self::$collector[$string]['origin']);
-		$s = $str;
+	static private function yieldParser($templateName){
+		$str = explode("\n", self::$collector[$templateName]['origin']);
 		foreach ($str as $line){
-			
 			if(strpos($line, '@yield(')>-1){
 				$section = self::getBetwing($line, '@yield(', ')');
 				$section = trim(trim($section), "''");
 				$start = strpos($line, '@yield(');
 				$end = strpos($line, ')');
 				$search = substr($line, $start, $end-$start+1);
-				if(isset(self::$collector[$string]['section-new'])&&
-					isset(self::$collector[$string]['section-new'][$section])){
-					$replace = implode("\n", self::$collector[$string]['section-new'][$section]);
+				if(isset(self::$collector[$templateName]['section']['stop'])&&
+					isset(self::$collector[$templateName]['section']['stop'][$section])){
+					$replace = implode("\n", self::$collector[$templateName]['section']['stop'][$section]);
 					$str = str_replace($search, $replace, $str);
 				}
 			}

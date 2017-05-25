@@ -1,14 +1,14 @@
 @extend( 'template/level-1'  )
 
-@section('titulo')	
-level 2
+@section('title')	
+level -2
 @stop
 
-@section('contenido')
+@section('content')
 @parent
-<div style="background-color: #00f;">Content of level #-2</div>
+<div style="background-color: #00f;">Content of level #-2 <?php echo __FILE__;?> </div>
 @stop
 
-@section('nueva')
-Section nested using @yield
+@section('new')
+Section nested using @yield <?php echo __FILE__;?> 
 @stop
